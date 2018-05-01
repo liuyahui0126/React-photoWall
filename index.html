@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>react照片墙</title>
+    <link rel="stylesheet" href="./css/index.css">
+</head>
+
+<body>
+    <div id="photowall"></div>
+    <script src="js/react.development.js"></script>
+    <script src="js/react-dom.development.js"></script>
+    <script src="js/browser.js"></script>
+    <script src="data/image.js"></script>
+    <!-- <script src="components/photoWall.js" type="text/babel"></script> -->
+    <script type="text/babel">
+    class ImgFigure extends React.Component{
+        // const styleObj = {
+        //     top: this.props.imgFigureArr.pos.top,
+        //     left: this.props.imgFigureArr.pos.left
+        // }
+        render(){
+            var imgSrc = './photos/'+this.props.imgArr.fileName;
+            var imgtitle =this.props.imgArr.title;
+            var imgDesc = this.props.imgArr.desc;
+            return(
+                <figure className="img-figure">
+                    <img src={imgSrc}/>
+                    <figcaption>
+                        <h3>{imgtitle}</h3>
+                        <h3></h3>
+                    </figcaption>
+                </figure>
+            )
+        }
+    }
+    class Controller extends React.Component{
+        render(){
+            return(
+                <span></span>
+            )
+        }
+    }
+    class Photowall extends React.Component{
+        constructor(props){
+            super(props);
+            this.state = {
+                imgFigureArr:[{
+                     pos:{
+                         top:0,
+                         left:0
+                        }
+                    }
+                ]
+            };
+        }
+        const:{
+             centerPos:{
+                 top:0,
+                 left:0
+             },
+             xLeftMin : 0,
+             xLefMax:0,
+             xRight: 0,
+        }
+        componentDidMount(){
+            var stageDOM = this.refs.stage;
+            var wStageDOM = stageDOM.offsetWidth;
+            var hStageDOM = stageDOM.offsetHeight;
+            var wHalfStageDOM = wStageDOM / 2;
+            var hHalfStageDOM = hStageDOM / 2;
+            var imgFigureDOM = ReactDOM.findDOMNode(this.refs.ImgFigure);
+            var wimgFigureDOM = imgFigureDOM.offsetWidth;
+            var himgFigureDOM = imgFigureDOM.offsetHeight;
+            var wHalfimgFigureDOM = wimgFigureDOM / 2;
+            var hHalfimgFigureDOM = himgFigureDOM / 2;
+        }
+        render(){
+            var imgArr = [];
+            var controlArr = [];
+            imgDatas.forEach(function(item,index){
+                //给state设置初始值
+                if(!this.state.imgFigureArr[index]){
+                    this.state.imgFigureArr[index] = {
+                     pos:{
+                         top:0,
+                         left:0
+                        }
+                    }
+                }
+                imgArr.push(<ImgFigure imgArr={imgDatas[index]} 
+                            imgFigureArr={this.state.imgFigureArr[index]} key={index}
+                            ref="ImgFigure"/>);
+                controlArr.push(<Controller key={index}/>)
+            }.bind(this)) 
+            return(
+                <section className="stage" ref="stage">
+                        <section>{imgArr}</section>
+                        <nav>{controlArr}</nav>
+                </section>
+            )
+        }
+    }
+
+    ReactDOM.render(
+        <Photowall/>,
+        document.getElementById('photowall')
+    );
+    function getRandom(low,high){
+        return Math.ceil(Math.random() * (high-low)+low);
+    }
+    </script>
+</body>
+
+</html>
