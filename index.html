@@ -15,19 +15,20 @@
     <script src="js/react-dom.development.js"></script>
     <script src="js/browser.js"></script>
     <script src="data/image.js"></script>
-    <!-- <script src="components/photoWall.js" type="text/babel"></script> -->
-    <script type="text/babel">
+    <!-- <script src="./js/components/photoWall.js"  type="text/jsx"></script> -->
+   <script type="text/babel">
     class ImgFigure extends React.Component{
-        // const styleObj = {
-        //     top: this.props.imgFigureArr.pos.top,
-        //     left: this.props.imgFigureArr.pos.left
-        // }
         render(){
+            var styleObj = {
+                top: this.props.imgFigureArr.pos.top,
+                left: this.props.imgFigureArr.pos.left,
+                transform: "rotate("+this.props.imgFigureArr.rotate+"deg)"
+            }
             var imgSrc = './photos/'+this.props.imgArr.fileName;
             var imgtitle =this.props.imgArr.title;
             var imgDesc = this.props.imgArr.desc;
             return(
-                <figure className="img-figure">
+                <figure className="img-figure" style={styleObj}>
                     <img src={imgSrc}/>
                     <figcaption>
                         <h3>{imgtitle}</h3>
@@ -52,7 +53,8 @@
                      pos:{
                          top:0,
                          left:0
-                        }
+                        },
+                    rotate:0
                     }
                 ]
             };
@@ -63,10 +65,14 @@
                  left:0
              },
              xLeftMin : 0,
-             xLefMax:0,
-             xRight: 0,
+             xLeftMax:0,
+             xRightMin: 0,
+             xRightMax:0,
+             yMin:0,
+             yMax:0
         }
         componentDidMount(){
+            //获取舞台和图片真实宽度，计算宽度和高度
             var stageDOM = this.refs.stage;
             var wStageDOM = stageDOM.offsetWidth;
             var hStageDOM = stageDOM.offsetHeight;
@@ -77,6 +83,40 @@
             var himgFigureDOM = imgFigureDOM.offsetHeight;
             var wHalfimgFigureDOM = wimgFigureDOM / 2;
             var hHalfimgFigureDOM = himgFigureDOM / 2;
+            this.const = {
+                centerPos:{
+                    top: hHalfStageDOM - hHalfimgFigureDOM,
+                    left : wHalfStageDOM - wHalfimgFigureDOM 
+                },
+                xLeftMin : -wHalfimgFigureDOM,
+                xLeftMax: wHalfStageDOM - 3 * wHalfimgFigureDOM,
+                xRightMin: wHalfStageDOM + wHalfimgFigureDOM,
+                xRightMax: wStageDOM - wHalfimgFigureDOM,
+                yMin: -hHalfimgFigureDOM,
+                yMax: hStageDOM - hHalfimgFigureDOM
+            }
+            var imgFigureInfo  = this.state.imgFigureArr;
+            var infoLen = imgFigureInfo.length;
+            //小的一半的图片放在左边，大的放在右边
+            for(var i = 0;i< infoLen;i++){
+                if(i < infoLen/2){
+                    imgFigureInfo[i].pos = {
+                        top: getRandom(this.const.yMin,this.const.yMax),
+                        left: getRandom(this.const.xLeftMin,this.const.xLeftMax)
+                    }
+                }else{
+                    imgFigureInfo[i].pos = {
+                        top: getRandom(this.const.yMin,this.const.yMax),
+                        left: getRandom(this.const.xRightMin,this.const.xRightMax)
+                    }
+                }
+                imgFigureInfo[i].rotate = getRandom(-30,30);
+            }
+            imgFigureInfo[0].pos = this.const.centerPos;
+            imgFigureInfo[0].rotate = 0;
+            this.setState({
+                imgFigureArr: imgFigureInfo
+            })
         }
         render(){
             var imgArr = [];
@@ -88,7 +128,8 @@
                      pos:{
                          top:0,
                          left:0
-                        }
+                        },
+                    rotate:0
                     }
                 }
                 imgArr.push(<ImgFigure imgArr={imgDatas[index]} 
